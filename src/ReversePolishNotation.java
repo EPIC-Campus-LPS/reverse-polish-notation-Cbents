@@ -57,9 +57,72 @@ public class ReversePolishNotation {
     public static String infixToPostfix(String input) {
         Stack s = new Stack();
 
-        String name = "hello";
-        return name;
+        String numFilter = "-+*/^";
+        char[] inList = input.toCharArray();
+        int numCount = 0;
+        int operatorCount = 0;
+        String output = "";
+
+
+
+        for (char c : inList) {
+            //space
+            if (c == ' ') {
+                continue;
+            }
+
+            // operand
+            else if (Character.isLetterOrDigit(c)) {
+                output += c;
+            }
+            // parenthesis special case
+            else if (c == '(') {
+                s.push("(");
+            }
+
+            else if (c == ')') {
+                while (!s.isEmpty() && !s.peek().equals("(")) {
+                    output += s.pop();
+                }
+                s.pop(); // remove the (
+            }
+
+            // operator
+            else if (isOperator(c)) {
+
+                while (!s.isEmpty()
+                        && isOperator(s.peek().charAt(0))
+                        && (
+                        precedence(s.peek().charAt(0)) > precedence(c)
+                                || (precedence(s.peek().charAt(0)) == precedence(c) && c != '^')
+                )
+                ) {
+
+                    output += s.pop();
+                }
+
+                s.push(Character.toString(c));
+            }
+        }
+
+        while (!s.isEmpty()) {
+            output += s.pop();
+        }
+
+        return output;
     }
 
-}
+    private static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+    }
+
+    private static int precedence(char c) {
+        if (c == '+' || c == '-') return 1;
+        if (c == '*' || c == '/') return 2;
+        if (c == '^') return 3;
+        return -1;
+    }
+    }
+
+
 
